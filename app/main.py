@@ -1,9 +1,11 @@
 from typing import Any, Optional
 
+
 class Node:
     def __init__(self, key: Any, value: Any) -> None:
         self.key = key
         self.value = value
+
 
 class Dictionary:
     def __init__(self) -> None:
@@ -39,7 +41,6 @@ class Dictionary:
             if node is not None:
                 self.__setitem__(node.key, node.value)
 
-
     def get_index(self, key: Any) -> int:
         return int(self.get_hash(key) % self.max_capacity)
 
@@ -61,7 +62,8 @@ class Dictionary:
 
     def __setitem__(self, key: Any, value: Any) -> Any:
         index = self.get_index(key)
-        if self.table[index] is None and self.current_capacity < self.threshold:
+        if (self.table[index] is None
+                and self.current_capacity < self.threshold):
             self.add_new(index, key, value)
         elif self.current_capacity >= self.threshold:
             self.rebuild_table()
@@ -73,28 +75,19 @@ class Dictionary:
             index = self.get_empty_position(index)
             self.add_new(index, key, value)
 
-    def __getitem__(self, key: Any):
+    def __getitem__(self, key: Any) -> Any:
         index = self.get_index(key)
-        while True:
-            if self.table[index] is None:
-                raise KeyError(key)
-            if self.table[index].key == key:
-                return self.table[index].value
-            index += 1
-            if index >= self.max_capacity:
-                index = 0
+        if self.table[index].key == key:
+            return self.table[index].value
+        else:
+            while True:
+                if self.table[index] is None:
+                    raise KeyError("missing_key")
+                if self.table[index].key == key:
+                    return self.table[index].value
+                index += 1
+                if index >= self.max_capacity:
+                    index = 0
 
-
-    def __len__ (self):
+    def __len__(self) -> int:
         return self.current_capacity
-
-
-
-
-
-
-
-
-
-
-
