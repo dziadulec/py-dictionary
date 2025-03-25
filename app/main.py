@@ -16,23 +16,20 @@ class Dictionary:
         self.table = [None] * self.max_capacity
 
     @staticmethod
-    def get_hash(key: Any) -> int:
-        return hash(key)
+    def _hash(key: Any) -> int:
+        hash_value = 0
+        key_str = repr(key)
+        for index, char in enumerate(key_str):
+            hash_value = (hash_value * 7 + ord(char))
+        return hash_value
 
     def get_index(self, key: Any) -> int:
-        return self.get_hash(key) % self.max_capacity
-
-    def find_empty_slot(self, index: int) -> int:
-        start_index = index
-        while True:
-            if self.table[index] is None:
-                return index
-            index = (index + 1) % self.max_capacity
-            if index == start_index:
-                raise Exception("Dictionary is full")
+        # print(f"index {self.get_hash(key) % self.max_capacity}")
+        return self._hash(key) % self.max_capacity
 
     def insert(self, index: int, key: Any, value: Any) -> None:
         self.table[index] = Node(key, value)
+        # print(f"Key {key}")
         self.current_capacity += 1
 
     def rebuild_table(self) -> None:
@@ -51,13 +48,17 @@ class Dictionary:
             self.rebuild_table()
 
         index = self.get_index(key)
-        if self.table[index] is None:
-            self.insert(index, key, value)
-        elif self.table[index].key == key:
-            self.table[index].value = value
-        else:
-            index = self.find_empty_slot(index)
-            self.insert(index, key, value)
+
+        while True:
+            if self.table[index] is None:
+                self.insert(index, key, value)
+                break
+            elif self.table[index].key == key:
+                self.table[index].value = value
+                break
+            index += 1
+            if index == self.max_capacity:
+                index = 0
 
     def __getitem__(self, key: Any) -> Any:
         index = self.get_index(key)
